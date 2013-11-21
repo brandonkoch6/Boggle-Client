@@ -40,8 +40,8 @@ namespace BB
         private readonly Object playerQueueLock;
 
         // 
-        public int gameTime;
-        private string dictionaryFilepath;
+        private int gameTime;
+        private static HashSet<string> dictionaryFile;
         private string optionalBoggleBoard;
 
         #endregion
@@ -55,6 +55,10 @@ namespace BB
         {
             args = new String[]{"20", "dictionary.txt", ""};
 
+            // If file path is not valid, throw exception.
+            if (!System.IO.File.Exists(args[1]))
+                throw new Exception("Invalid dictionary file path.");
+            
             // Check to see that the appropriate number of arguments has been passed
             // to the server via the string[] args
             if (args.Length == 2)
@@ -78,11 +82,24 @@ namespace BB
         /// <summary>
         /// Constructor that creates a BoggleServer that listens for connection requests on port 2000
         /// </summary>
-        public BoggleServer(string gameLength, string dictionaryFile, string customBoard)
+        public BoggleServer(string gameLength, string dictionaryFilePath, string customBoard)
         {
             // Assign to global variables:
             int.TryParse(gameLength, out gameTime);
-            this.dictionaryFilepath = dictionaryFile;
+
+            try
+            {
+                // Create a dictionary set of words based on the filepath of the dictionary.
+                string[] lines = System.IO.File.ReadAllLines(dictionaryFilePath);
+                foreach (string line in lines)
+                {
+                    dictionaryFile.Add(line);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Issues parsing dictionary file");
+            }
 
             // Check to see if the optionalBoard exists and if it is 16 characters
             if (customBoard.Length == 16)
@@ -160,6 +177,8 @@ namespace BB
                 // If we didn't receive a play command then keep listening for additional commands
             else
             {
+                // The client has deviated from the protocol - send IGNORING message.
+                currentSS.BeginSend("IGNORING" + s, (exc, o) => { }, 2);
                 currentSS.BeginReceive(messageRetreived, currentSS);
             }
 
@@ -225,8 +244,8 @@ namespace BB
                 }
  
                 //Send some sort of welcome message
-                playerOne.StringSocketReceive.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
-                playerTwo.StringSocketReceive.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
 
                 // Send the starting information
                 /* 
@@ -239,30 +258,143 @@ namespace BB
                  * its optional command line parameter.
                  */
 
-                playerOne.StringSocketReceive.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerTwo.getName + "\r\n", (e, o) => { }, 2);
-                playerTwo.StringSocketReceive.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerOne.getName + "\r\n", (e, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\r\n", (e, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\r\n", (e, o) => { }, 2);
 
+                // Will invoke timeElapse every 1000 milliseconds
                 timer.Elapsed += timeElapsed;
                 timer.Start();
 
                 // Start listening for inputs
-                playerOne.StringSocketReceive.BeginReceive(gameMessageReceived, playerOne.StringSocketReceive);
-                playerTwo.StringSocketReceive.BeginReceive(gameMessageReceived, playerTwo.StringSocketReceive);
+                playerOne.StringSocket.BeginReceive(gameMessageReceived, playerOne);
+                playerTwo.StringSocket.BeginReceive(gameMessageReceived, playerTwo);
                 
 
             }
 
             private void gameMessageReceived(string s, Exception e, object payload)
             {
-                StringSocket tempSS = (StringSocket)payload;
 
                 Console.WriteLine(s);
 
-                tempSS.BeginReceive(gameMessageReceived, tempSS);
+                Player readyPlayer = (Player)payload;
+
+                // Assume the opponent is playerOne
+                Player opponent = playerOne;
+
+                // If the readyPlayer is player one, change
+                // the opponent to playerTwo.
+                if (readyPlayer.Equals(playerOne))
+                {
+                    opponent = playerTwo;
+                }
+
+                // Check if the cmd line input was valid
+                if (s.StartsWith("word "))
+                {
+                    string word = s.Substring(4).Trim();
+
+                    bool isLegal = (dictionaryFile.Contains(word) && b.CanBeFormed(word));
+
+                    if (word.Length > 2)
+                    {
+                        // For any word that appears more than once, all but the first occurrence is removed (whether or not it is legal).
+                        if (!readyPlayer.LegalWords.Contains(word) && !readyPlayer.DuplicateWords.Contains(word) && !opponent.LegalWords.Contains(word) && !opponent.DuplicateWords.Contains(word))
+                        {
+                            // Add to the player's legal words
+                            readyPlayer.LegalWords.Add(word);
+
+                            // Increment player's score.
+                            readyPlayer.Score += AddScore(word);
+                        }
+                        // Each legal word that occurs on the opponent's list is removed.
+                        // Each remaining illegal word is worth negative one points.
+                        // Each remaining legal word earns a score that depends on its length.  Three and four-letter words are worth
+                        // one point, five-letter words are worth two points, six-letter words are worth three points, seven-letter words
+                        // are worth five points, and longer word are worth 11 points.
+
+
+                        // Legal - CanBeFormed, >2 letters
+                            
+                            // Is it not in duplicates list and in our legal words list?
+                                
+                                // Is it a duplicate?
+
+                                        // ADd to duplicate, subtract from opponent list and score
+                                // If not, we can add
+
+                        // Do nothing
+                    // Illegal
+                           // subtract points
+
+                        
+                    }
+
+                    // If the message is valid and it has greater than two characters
+                    if (b.CanBeFormed(s) && s.Length > 2)
+                    {
+                        // Add it to this player's set of words if it doesn't exist in the other player's set.
+                        if (!opponent.words.Contains(s))
+                        {
+                            readyPlayer.words.Add(s);
+                        }
+
+
+
+                    }
+                }
+                else
+                {
+                    // The client has deviated from the protocol - send IGNORING message.
+                    readyPlayer.StringSocket.BeginSend("IGNORING" + s, (exc, o) => { }, 2);
+                }
+
+                readyPlayer.StringSocket.BeginReceive(gameMessageReceived, readyPlayer);
+
 
             }
 
             #region Game Helper Methods
+
+            /// <summary>
+            /// Returns a positive value for a legal word.
+            /// </summary>
+            /// <param name="state"></param>
+            private int AddScore(string word)
+            {
+                // Each remaining legal word earns a score that depends on its length.  Three and four-letter words are worth
+                // one point, five-letter words are worth two points, six-letter words are worth three points, seven-letter words
+                // are worth five points, and longer word are worth 11 points.
+                if (word.Length == 3 || word.Length == 4)
+                    return 1;
+                else if (word.Length == 5)
+                    return 2;
+                else if (word.Length == 6)
+                    return 3;
+                else if (word.Length == 7)
+                    return 5;
+                else
+                    return 11;
+            }
+
+            /// <summary>
+            /// Returns a negative value for an illegal word.
+            /// </summary>
+            /// <param name="state"></param>
+            private int SubScore(string word)
+            {
+                // Subtract points from the player due to duplicates.
+                if (word.Length == 3 || word.Length == 4)
+                    return -1;
+                else if (word.Length == 5)
+                    return -2;
+                else if (word.Length == 6)
+                    return -3;
+                else if (word.Length == 7)
+                    return -5;
+                else
+                    return -11;
+            }
 
             /// <summary>
             /// Method used to invoke the timer
@@ -274,8 +406,8 @@ namespace BB
                 timeCount = timeCount + 1;
 
                 // Notify the players a second has passed
-                playerOne.StringSocketReceive.BeginSend("TIME "+ (timeCount) +"\r\n", (exc, o) => { }, 2);
-                playerTwo.StringSocketReceive.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("TIME "+ (timeCount) +"\r\n", (exc, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
 
                 // If we have run out of time then end the game
                 if (timeCount == gameTime)
@@ -287,8 +419,8 @@ namespace BB
 
             private void EndGame()
             {
-                playerOne.StringSocketReceive.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
-                playerTwo.StringSocketReceive.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
             }
 
             #endregion
@@ -299,27 +431,35 @@ namespace BB
         /// </summary>
         private class Player
         {
-            // Instance variables for a request:
-            StringSocket ss;
-            string name;
+            // Instance variables for a player object:
+            private StringSocket ss;
+            private string name;
+            private int score;
+            private HashSet<string> legalWords;
+            private HashSet<string> illegalWords;
+            private HashSet<string> duplicateWords;
 
             /// <summary>
-            /// Constructor requires a delegate which takes an exception and an arbitrary object as an identifier
-            /// for the receive request as well as an Exception object.
+            /// Constructor requires a StringSocket object and the player's name.
             /// </summary>
             /// <param name="payloadReceive"></param>
             /// <param name="method"></param>
             public Player(StringSocket _ss, string _name)
             {
+                // Initialize instance variables:
                 this.ss = _ss;
                 this.name = _name;
+                this.legalWords = new HashSet<string>();
+                this.illegalWords = new HashSet<string>();
+                this.duplicateWords = new HashSet<string>();
+                this.score = 0;
 
             }
 
             /// <summary>
             /// Property which returns the payload identifier.
             /// </summary>
-            public StringSocket StringSocketReceive
+            public StringSocket StringSocket
             {
                 get { return ss; }
             }
@@ -327,9 +467,40 @@ namespace BB
             /// <summary>
             /// Property which returns the request callback.
             /// </summary>
-            public string getName
+            public string Name
             {
                 get { return name; }
+            }
+
+            /// <summary>
+            /// Property which returns the set of legal words played by this player.
+            /// </summary>
+            public HashSet<string> LegalWords
+            {
+                get { return legalWords; }
+            }
+            /// <summary>
+            /// Property which returns the set of illegal words played by this player.
+            /// </summary>
+            public HashSet<string> IllegalWords
+            {
+                get { return illegalWords; }
+            }
+            /// <summary>
+            /// Property which returns the duplicate words played by the player.
+            /// </summary>
+            public HashSet<string> DuplicateWords
+            {
+                get { return duplicateWords; }
+            }
+
+            /// <summary>
+            /// Property which returns the player's score.
+            /// </summary>
+            public int Score
+            {
+                get { return score; }
+                set { score = value; }
             }
 
 
