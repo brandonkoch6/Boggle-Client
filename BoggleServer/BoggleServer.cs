@@ -56,7 +56,7 @@ namespace BB
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            args = new String[] { "20", "C:/Users/Dalton/Desktop/School/CS 3500/Assignments/PS8Git/dictionary.txt", "" };
+            args = new String[] { "10", "C:/Users/Dalton/Desktop/School/CS 3500/Assignments/PS8Git/dictionary.txt", "" };
 
             // Check to see that the appropriate number of arguments has been passed
             // to the server via the string[] args
@@ -229,6 +229,7 @@ namespace BB
             int gameTime;
             System.Timers.Timer timer;
             int timeCount;
+            bool checkithomie;
 
             /// <summary>
             /// 
@@ -244,7 +245,8 @@ namespace BB
                 optionalBoggleBoard = _optionalBoggleBoard;
                 gameTime = _gameTime;
                 timer = new System.Timers.Timer(1000);
-                timeCount = 0;
+                timeCount = _gameTime;
+                checkithomie = false;
             }
 
             /// <summary>
@@ -300,17 +302,20 @@ namespace BB
                     opponent = playerTwo;
                 }
 
-
                 // If the player left
-                if (s == null)
+                if (s == null && !checkithomie)
                 {
                     // The server should send the command "TERMINATED" to the opponent
-                    opponent.StringSocket.BeginSend("TERMINATED" + "\r\n", (exc, o) => { }, 2);
-
-                    // Close the socket
-                    opponent.StringSocket.Close();
+                    opponent.StringSocket.BeginSend("TERMINATED" + "\r\n", (exc, o) => { opponent.StringSocket.Close(); }, 2);
 
                     // Exit
+                    return;
+                }
+                else if (s == null)
+                {
+                    // We have reached the end of the game and must close the other socket
+                    opponent.StringSocket.Close();
+
                     return;
                 }
 
@@ -433,23 +438,23 @@ namespace BB
             }
 
             /// <summary>
-            /// Method used to invoke the timer
+            /// Timer invoked method every 1000 milliseconds
             /// </summary>
             /// <param name="state"></param>
             private void timeElapsed(object sender, ElapsedEventArgs e)
             {
                 // Advance the timer one second
-                timeCount = timeCount + 1;
+                timeCount = timeCount - 1;
 
                 // Notify the players a second has passed
                 playerOne.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
                 playerTwo.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
 
                 // If we have run out of time then end the game
-                if (timeCount == gameTime)
+                if (timeCount == 0)
                 {
-                    EndGame();
                     timer.Stop();
+                    EndGame();                 
                 }
             }
 
@@ -458,37 +463,20 @@ namespace BB
             /// </summary>
             private void EndGame()
             {
-                playerOne.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
-                playerOne.StringSocket.BeginSend("STOP " + "\r\n", (exc, o) => { }, 2);
+                checkithomie = true;
 
+                playerOne.StringSocket.BeginSend("STOP " + printStats(playerOne, playerOne, playerOne.LegalWords) + printStats(playerOne, playerTwo, playerTwo.LegalWords) +
+                    printStats(playerOne, playerOne, playerOne.DuplicateWords) + printStats(playerOne, playerOne, playerOne.IllegalWords) + printStats(playerOne, playerTwo,
+                    playerTwo.IllegalWords) + "\r\n", (exc, o) => { finalClose(); }, 2);
 
-                // Print player one's legal words to player one
-                printStats(playerOne, playerOne, playerOne.LegalWords);
-                // Print player two's legal words to player one
-                printStats(playerOne, playerTwo, playerTwo.LegalWords);
-                // Print player one's duplicate words to player one
-                printStats(playerOne, playerOne, playerOne.DuplicateWords);
-                // Print player one's illegal words to player one
-                printStats(playerOne, playerOne, playerOne.IllegalWords);
-                // Print player two's illegal words to player one
-                printStats(playerOne, playerTwo, playerTwo.IllegalWords);
+                
+            }
 
-                playerTwo.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
-                playerTwo.StringSocket.BeginSend("STOP " + "\r\n", (exc, o) => { }, 2);
-
-                // Print player two's legal words to player two
-                printStats(playerTwo, playerTwo, playerTwo.LegalWords);
-                // Print player one's legal words to player two
-                printStats(playerTwo, playerOne, playerOne.LegalWords);
-                // Print player two's duplicate words to player two                
-                printStats(playerTwo, playerTwo, playerTwo.DuplicateWords);
-                // Print player two's illegal words to player two
-                printStats(playerTwo, playerTwo, playerTwo.IllegalWords);
-                // Print player one's illegal words to player two
-                printStats(playerTwo, playerOne, playerOne.IllegalWords);
-
-                // Close both sockets.
-                playerOne.StringSocket.Close();
+            private void finalClose()
+            {
+                playerTwo.StringSocket.BeginSend("STOP " + printStats(playerTwo, playerTwo, playerTwo.LegalWords) + printStats(playerTwo, playerOne, playerOne.LegalWords) +
+                    printStats(playerTwo, playerTwo, playerTwo.DuplicateWords) + printStats(playerTwo, playerTwo, playerTwo.IllegalWords) + printStats(playerTwo, playerOne,
+                    playerOne.IllegalWords) + "\r\n", (exc, o) => { playerTwo.StringSocket.Close(); }, 2);
             }
 
             /// <summary>
@@ -497,17 +485,23 @@ namespace BB
             /// <param name="sendPlayer"></param>
             /// <param name="collectionPlayer"></param>
             /// <param name="collection"></param>
-            private void printStats(Player sendPlayer, Player collectionPlayer, HashSet<string> collection)
+            private string printStats(Player sendPlayer, Player collectionPlayer, HashSet<string> collection)
             {
+                StringBuilder temp = new StringBuilder();
+
                 // Print the count and enumerate all words issued within the collection.
-                sendPlayer.StringSocket.BeginSend(collection.Count + "\r\n", (exc, o) => { }, 2);
+                //sendPlayer.StringSocket.BeginSend(collection.Count + "\r\n", (exc, o) => { }, 2);
+                
+                temp.Append(collection.Count + " ");
 
                 foreach (string word in collection)
                 {
-                    sendPlayer.StringSocket.BeginSend(word + " ", (exc, o) => { }, 2);
+                    //sendPlayer.StringSocket.BeginSend(word + " ", (exc, o) => { }, 2);
+
+                    temp.Append(word + " ");
                 }
 
-                sendPlayer.StringSocket.BeginSend("\r\n", (exc, o) => { }, 2); 
+                return temp.ToString();
             }
 
             #endregion
