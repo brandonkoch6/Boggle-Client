@@ -10,6 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E955D590-ED03-411C-8373-F7C38A5A8926}"
 	ProjectSection(SolutionItems) = preProject
 		dictionary.txt = dictionary.txt
+		StringSocket.dll = StringSocket.dll
+		StringSocket.pdb = StringSocket.pdb
 	EndProjectSection
 EndProject
 Global

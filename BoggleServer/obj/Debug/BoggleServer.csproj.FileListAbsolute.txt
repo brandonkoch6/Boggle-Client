@@ -12,8 +12,6 @@ C:\Users\Brandon\Documents\Visual Studio 2012\Projects\CS 3500\Assignments\PS8\B
 C:\Users\Brandon\Documents\Visual Studio 2012\Projects\CS 3500\Assignments\PS8\BoggleServer\obj\Debug\BoggleServer.exe
 C:\Users\Brandon\Documents\Visual Studio 2012\Projects\CS 3500\Assignments\PS8\BoggleServer\obj\Debug\BoggleServer.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\BoggleServer.exe.config
-C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\obj\Debug\BoggleServer.exe
-C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\obj\Debug\BoggleServer.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\BoggleServer.exe
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\BoggleServer.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\BoggleBoard.dll
@@ -21,3 +19,5 @@ C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\BoggleBoard.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\bin\Debug\StringSocket.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\obj\Debug\BoggleServer.csprojResolveAssemblyReference.cache
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\obj\Debug\BoggleServer.exe
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServer\obj\Debug\BoggleServer.pdb

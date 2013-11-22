@@ -39,12 +39,15 @@ namespace BB
         // Locks
         private readonly Object playerQueueLock;
 
+
         // 
         private int gameTime;
         private static HashSet<string> dictionaryFile;
         private string optionalBoggleBoard;
 
         #endregion
+
+        #region Pre-Game Warmup
 
         /// <summary>
         /// Receives argument from user.  Requires 2 - 3 arguments to begin boggle game,
@@ -53,30 +56,36 @@ namespace BB
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            args = new String[]{"20", "dictionary.txt", ""};
+            args = new String[] { "20", "C:/Users/Dalton/Desktop/School/CS 3500/Assignments/PS8Git/dictionary.txt", "" };
 
-            // If file path is not valid, throw exception.
-            if (!System.IO.File.Exists(args[1]))
-                throw new Exception("Invalid dictionary file path.");
-            
             // Check to see that the appropriate number of arguments has been passed
             // to the server via the string[] args
             if (args.Length == 2)
             {
-                 new BoggleServer(args[0], args[1], "");
 
-                 // Keep the main thread active so we can see output to the console
-                 Console.ReadLine();
+                // If file path is not valid, throw exception.
+                if (!System.IO.File.Exists(args[1]))
+                    throw new Exception("Invalid dictionary file path.");
+
+                new BoggleServer(args[0], args[1], "");
+
+                // Keep the main thread active so we can see output to the console
+                Console.ReadLine();
             }
-            else if(args.Length == 3)
+            else if (args.Length == 3)
             {
+
+                // If file path is not valid, throw exception.
+                if (!System.IO.File.Exists(args[1]))
+                    throw new Exception("Invalid dictionary file path.");
+
                 new BoggleServer(args[0], args[1], args[2]);
 
                 // Keep the main thread active so we can see output to the console
                 Console.ReadLine();
             }
             else
-                throw new Exception();
+                throw new Exception("Invalid number of arguments");
         }
 
         /// <summary>
@@ -86,7 +95,9 @@ namespace BB
         {
             // Assign to global variables:
             int.TryParse(gameLength, out gameTime);
+            dictionaryFile = new HashSet<string>();
 
+            // Attempt to create dictionary from file
             try
             {
                 // Create a dictionary set of words based on the filepath of the dictionary.
@@ -110,10 +121,11 @@ namespace BB
             {
                 this.optionalBoggleBoard = "";
             }
-            
+
             // Instantiate variables
             playerQueue = new Queue<Player>();
             playerQueueLock = new Object();
+    
 
             // A TcpListener listening for any incoming connections
             boggleServer = new TcpListener(IPAddress.Any, 2000);
@@ -141,7 +153,7 @@ namespace BB
             StringSocket ss = new StringSocket(s, encoding);
 
             // Start listening to that player
-            ss.BeginReceive(messageRetreived,ss);
+            ss.BeginReceive(messageRetreived, ss);
 
             // Send them a welcome message
             ss.BeginSend("Welcome To Our Boggle Server \r\n", (e, o) => { }, 2);
@@ -161,7 +173,7 @@ namespace BB
         private void messageRetreived(string s, Exception e, object payload)
         {
             // Cast the payload as a String Socket
-            StringSocket currentSS = (StringSocket) payload;
+            StringSocket currentSS = (StringSocket)payload;
 
             // Check if they asked to play
             if (s.StartsWith("play ", true, null))
@@ -174,11 +186,11 @@ namespace BB
 
                 currentSS.BeginSend("Waiting for another player... \r\n", (exc, o) => { }, currentSS);
             }
-                // If we didn't receive a play command then keep listening for additional commands
+            // If we didn't receive a play command then keep listening for additional commands
             else
             {
                 // The client has deviated from the protocol - send IGNORING message.
-                currentSS.BeginSend("IGNORING" + s, (exc, o) => { }, 2);
+                currentSS.BeginSend("IGNORING: " + s + "\r\n", (exc, o) => { }, 2);
                 currentSS.BeginReceive(messageRetreived, currentSS);
             }
 
@@ -200,7 +212,9 @@ namespace BB
             }
         }
 
-        #region Helper Classes
+        #endregion
+
+        #region Game Time
 
         /// <summary>
         ///  This encapsulates two players and a method to begin the game
@@ -216,10 +230,17 @@ namespace BB
             System.Timers.Timer timer;
             int timeCount;
 
-            public Game(Player player1, Player player2, string _optionalBoggleBoard, int _gameTime)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="player1"></param>
+            /// <param name="player2"></param>
+            /// <param name="_optionalBoggleBoard"></param>
+            /// <param name="_gameTime"></param>
+            public Game(Player _playerOne, Player _playerTwo, string _optionalBoggleBoard, int _gameTime)
             {
-                playerOne = player1;
-                playerTwo = player2;
+                playerOne = _playerOne;
+                playerTwo = _playerTwo;
                 optionalBoggleBoard = _optionalBoggleBoard;
                 gameTime = _gameTime;
                 timer = new System.Timers.Timer(1000);
@@ -242,22 +263,12 @@ namespace BB
                 {
                     b = new BoggleBoard(optionalBoggleBoard);
                 }
- 
-                //Send some sort of welcome message
+
+                // Notify players that a game is about to begin
                 playerOne.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
                 playerTwo.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
 
                 // Send the starting information
-                /* 
-                 * Once the server has received connections from two clients that are ready to play, 
-                 * it pairs them in a game. The server begins the game by sending a command to each client. 
-                 * The command is "START $ # @", where $ is the 16 characters that appear on the Boggle board 
-                 * being used for this game, # is the length of the game in seconds, and @ is the opponent's name.
-                 * The length of the game should be the value that was passed to the server as a command line parameter. 
-                 * The board configuration should be chosen at random, unless a configuration was passed to the server as 
-                 * its optional command line parameter.
-                 */
-
                 playerOne.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\r\n", (e, o) => { }, 2);
                 playerTwo.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\r\n", (e, o) => { }, 2);
 
@@ -268,13 +279,14 @@ namespace BB
                 // Start listening for inputs
                 playerOne.StringSocket.BeginReceive(gameMessageReceived, playerOne);
                 playerTwo.StringSocket.BeginReceive(gameMessageReceived, playerTwo);
-                
+
 
             }
 
             private void gameMessageReceived(string s, Exception e, object payload)
             {
 
+                // Writes player input to server console
                 Console.WriteLine(s);
 
                 Player readyPlayer = (Player)payload;
@@ -282,76 +294,100 @@ namespace BB
                 // Assume the opponent is playerOne
                 Player opponent = playerOne;
 
-                // If the readyPlayer is player one, change
-                // the opponent to playerTwo.
+                // If the readyPlayer is player one, change the opponent to playerTwo.
                 if (readyPlayer.Equals(playerOne))
                 {
                     opponent = playerTwo;
                 }
 
+
+                // If the player left
+                if (s == null)
+                {
+                    // The server should send the command "TERMINATED" to the opponent
+                    opponent.StringSocket.BeginSend("TERMINATED" + "\r\n", (exc, o) => { }, 2);
+
+                    // Close the socket
+                    opponent.StringSocket.Close();
+
+                    // Exit
+                    return;
+                }
+
                 // Check if the cmd line input was valid
                 if (s.StartsWith("word "))
                 {
-                    string word = s.Substring(4).Trim();
+                    string word = s.Substring(4).Trim().ToUpper();
 
                     bool isLegal = (dictionaryFile.Contains(word) && b.CanBeFormed(word));
 
+                    // if > 2 letters
                     if (word.Length > 2)
                     {
-                        // For any word that appears more than once, all but the first occurrence is removed (whether or not it is legal).
-                        if (!readyPlayer.LegalWords.Contains(word) && !readyPlayer.DuplicateWords.Contains(word) && !opponent.LegalWords.Contains(word) && !opponent.DuplicateWords.Contains(word))
+                        // Legal - CanBeFormed and in Dictionary
+                        if (b.CanBeFormed(word) && dictionaryFile.Contains(word))
                         {
-                            // Add to the player's legal words
-                            readyPlayer.LegalWords.Add(word);
 
-                            // Increment player's score.
-                            readyPlayer.Score += AddScore(word);
-                        }
-                        // Each legal word that occurs on the opponent's list is removed.
-                        // Each remaining illegal word is worth negative one points.
-                        // Each remaining legal word earns a score that depends on its length.  Three and four-letter words are worth
-                        // one point, five-letter words are worth two points, six-letter words are worth three points, seven-letter words
-                        // are worth five points, and longer word are worth 11 points.
-
-
-                        // Legal - CanBeFormed, >2 letters
-                            
                             // Is it not in duplicates list and in our legal words list?
-                                
+                            if (!readyPlayer.DuplicateWords.Contains(word) && !readyPlayer.LegalWords.Contains(word))
+                            {
+
                                 // Is it a duplicate?
+                                if (opponent.LegalWords.Contains(word))
+                                {
 
-                                        // ADd to duplicate, subtract from opponent list and score
-                                // If not, we can add
+                                    // Add to duplicate, 
+                                    readyPlayer.DuplicateWords.Add(word);
+                                    opponent.DuplicateWords.Add(word);
 
-                        // Do nothing
-                    // Illegal
-                           // subtract points
+                                    //Subtract from opponent list and score
+                                    opponent.LegalWords.Remove(word);
+                                    opponent.Score += SubScore(word);
 
-                        
-                    }
+                                    // Display score to the user
+                                    readyPlayer.StringSocket.BeginSend("SCORE: " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
+                                    opponent.StringSocket.BeginSend("SCORE: " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                                }
+                                // Otherwise we can add it to the readyPlayer's score.
+                                else
+                                {
+                                    // Add the word to the player's legal word list and their score
+                                    readyPlayer.LegalWords.Add(word);
+                                    readyPlayer.Score += AddScore(word);
 
-                    // If the message is valid and it has greater than two characters
-                    if (b.CanBeFormed(s) && s.Length > 2)
-                    {
-                        // Add it to this player's set of words if it doesn't exist in the other player's set.
-                        if (!opponent.words.Contains(s))
-                        {
-                            readyPlayer.words.Add(s);
+                                    // Display score to the user
+                                    readyPlayer.StringSocket.BeginSend("SCORE: " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
+                                    opponent.StringSocket.BeginSend("SCORE: " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                                }
+                            }
+
+                            // Do nothing
                         }
+                        // Illegal
+                        else
+                        {
+                            // Subtract points if not already in illegal words list
+                            if (!readyPlayer.IllegalWords.Contains(word))
+                            {
+                                // Add to player's illegal word list and subtract from score
+                                readyPlayer.IllegalWords.Add(word);
+                                readyPlayer.Score -= 1;
 
-
-
+                                // Display score to the user
+                                readyPlayer.StringSocket.BeginSend("SCORE: " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
+                                opponent.StringSocket.BeginSend("SCORE: " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                            }
+                        }
                     }
                 }
                 else
                 {
                     // The client has deviated from the protocol - send IGNORING message.
-                    readyPlayer.StringSocket.BeginSend("IGNORING" + s, (exc, o) => { }, 2);
+                    readyPlayer.StringSocket.BeginSend("IGNORING: " + s + "\r\n", (exc, o) => { }, 2);
                 }
 
+                // Regardless, we need to keep listening to the player
                 readyPlayer.StringSocket.BeginReceive(gameMessageReceived, readyPlayer);
-
-
             }
 
             #region Game Helper Methods
@@ -406,7 +442,7 @@ namespace BB
                 timeCount = timeCount + 1;
 
                 // Notify the players a second has passed
-                playerOne.StringSocket.BeginSend("TIME "+ (timeCount) +"\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
                 playerTwo.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
 
                 // If we have run out of time then end the game
@@ -417,10 +453,61 @@ namespace BB
                 }
             }
 
+            /// <summary>
+            /// Ends the game for two players by printing all stats and closing the both sockets.
+            /// </summary>
             private void EndGame()
             {
                 playerOne.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("STOP " + "\r\n", (exc, o) => { }, 2);
+
+
+                // Print player one's legal words to player one
+                printStats(playerOne, playerOne, playerOne.LegalWords);
+                // Print player two's legal words to player one
+                printStats(playerOne, playerTwo, playerTwo.LegalWords);
+                // Print player one's duplicate words to player one
+                printStats(playerOne, playerOne, playerOne.DuplicateWords);
+                // Print player one's illegal words to player one
+                printStats(playerOne, playerOne, playerOne.IllegalWords);
+                // Print player two's illegal words to player one
+                printStats(playerOne, playerTwo, playerTwo.IllegalWords);
+
                 playerTwo.StringSocket.BeginSend("THE GAME HAS ENDED!\r\n", (exc, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("STOP " + "\r\n", (exc, o) => { }, 2);
+
+                // Print player two's legal words to player two
+                printStats(playerTwo, playerTwo, playerTwo.LegalWords);
+                // Print player one's legal words to player two
+                printStats(playerTwo, playerOne, playerOne.LegalWords);
+                // Print player two's duplicate words to player two                
+                printStats(playerTwo, playerTwo, playerTwo.DuplicateWords);
+                // Print player two's illegal words to player two
+                printStats(playerTwo, playerTwo, playerTwo.IllegalWords);
+                // Print player one's illegal words to player two
+                printStats(playerTwo, playerOne, playerOne.IllegalWords);
+
+                // Close both sockets.
+                playerOne.StringSocket.Close();
+            }
+
+            /// <summary>
+            /// Prints the count and enumerates all words within a given collection and sends it to the client of the indicated player.
+            /// </summary>
+            /// <param name="sendPlayer"></param>
+            /// <param name="collectionPlayer"></param>
+            /// <param name="collection"></param>
+            private void printStats(Player sendPlayer, Player collectionPlayer, HashSet<string> collection)
+            {
+                // Print the count and enumerate all words issued within the collection.
+                sendPlayer.StringSocket.BeginSend(collection.Count + "\r\n", (exc, o) => { }, 2);
+
+                foreach (string word in collection)
+                {
+                    sendPlayer.StringSocket.BeginSend(word + " ", (exc, o) => { }, 2);
+                }
+
+                sendPlayer.StringSocket.BeginSend("\r\n", (exc, o) => { }, 2); 
             }
 
             #endregion
@@ -507,5 +594,5 @@ namespace BB
         }
 
         #endregion
-    }      
+    }
 }
