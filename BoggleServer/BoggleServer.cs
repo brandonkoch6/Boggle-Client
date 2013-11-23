@@ -13,7 +13,7 @@ using System.Timers;
 
 namespace BB
 {
-    class BoggleServer
+    public class BoggleServer
     {
         #region Implementation Thoughts
         //args will be passed two, possibly three command line parameters
@@ -267,12 +267,12 @@ namespace BB
                 }
 
                 // Notify players that a game is about to begin
-                playerOne.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
-                playerTwo.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
+                //playerOne.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
+                //playerTwo.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
 
                 // Send the starting information
-                playerOne.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\r\n", (e, o) => { }, 2);
-                playerTwo.StringSocket.BeginSend("\nSTART " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\r\n", (e, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\r\n", (e, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\r\n", (e, o) => { }, 2);
 
                 // Will invoke timeElapse every 1000 milliseconds
                 timer.Elapsed += timeElapsed;
