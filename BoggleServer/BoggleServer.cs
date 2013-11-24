@@ -184,7 +184,7 @@ namespace BB
                 // Now that the player is ready, place them in the queue
                 playerQueue.Enqueue(tempPlayer);
 
-                currentSS.BeginSend("Waiting for another player... \r\n", (exc, o) => { }, currentSS);
+                //currentSS.BeginSend("Waiting for another player... \r\n", (exc, o) => { }, currentSS);
             }
             // If we didn't receive a play command then keep listening for additional commands
             else

@@ -92,6 +92,7 @@ namespace BoggleServerTest
                     player2SS.BeginReceive(CompletedReceive6, 6);
 
                     player1SS.BeginSend("play dalton \n", (e, o) => { }, 1);
+                    Thread.Sleep(1000);
                     player2SS.BeginSend("play brandon \n", (e, o) => { }, 1);
 
                     // Now send the data.  Hope those receive requests didn't block!
@@ -112,19 +113,19 @@ namespace BoggleServerTest
                     Assert.AreEqual(2, p2);
 
                     Assert.AreEqual(true, mre3.WaitOne(timeout), "Timed out waiting 3");
-                    Assert.AreEqual("Waiting for another player... \r", s3);
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 10 brandon\r", s3);
                     Assert.AreEqual(3, p3);
 
                     Assert.AreEqual(true, mre4.WaitOne(timeout), "Timed out waiting 4");
-                    Assert.AreEqual("Waiting for another player... \r", s4);
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 10 dalton\r", s4);
                     Assert.AreEqual(4, p4);
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 10 brandon\r", s5);
+                    Assert.AreEqual("TIME 9\r", s5);
                     Assert.AreEqual(5, p5);
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 10 dalton\r", s6);
+                    Assert.AreEqual("TIME 9\r", s6);
                     Assert.AreEqual(6, p6);
                 }
                 finally
