@@ -5,5 +5,6 @@ C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8\BoggleBoard\obj\Debug\Bog
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8\BoggleBoard\obj\Debug\BoggleBoard.pdb
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleBoard\bin\Debug\BoggleBoard.dll
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleBoard\bin\Debug\BoggleBoard.pdb
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleBoard\obj\Debug\BoggleBoard.csprojResolveAssemblyReference.cache
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleBoard\obj\Debug\BoggleBoard.dll
 C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleBoard\obj\Debug\BoggleBoard.pdb
