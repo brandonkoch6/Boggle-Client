@@ -36,11 +36,9 @@ namespace BB
         // Queue for holding latest two String Sockets that come in
         Queue<Player> playerQueue;
 
-        // Locks
+        // Locks the player queue
         private readonly Object playerQueueLock;
 
-
-        // 
         private int gameTime;
         private static HashSet<string> dictionaryFile;
         private string optionalBoggleBoard;
@@ -56,7 +54,7 @@ namespace BB
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            args = new String[] { "10", "C:/Users/Dalton/Desktop/School/CS 3500/Assignments/PS8Git/dictionary.txt", "" };
+            //args = new String[] { "10", "C:/Users/Dalton/Desktop/School/CS 3500/Assignments/PS8Git/dictionary.txt", "" };
 
             // Check to see that the appropriate number of arguments has been passed
             // to the server via the string[] args
@@ -585,6 +583,15 @@ namespace BB
             }
 
 
+        }
+
+        #endregion
+
+        #region Post Game
+
+        public void Stop()
+        {
+            boggleServer.Stop();
         }
 
         #endregion
