@@ -15,16 +15,6 @@ namespace BB
 {
     public class BoggleServer
     {
-        #region Implementation Thoughts
-        //args will be passed two, possibly three command line parameters
-        // The time in seconds the game should last
-        // Pathname of a file containing all legal words
-        // An optional string of 16 characters that can be used to initialize a boggle board
-
-        //Create a string socket and wait for a connection to be established
-
-        #endregion
-
         #region Globals
 
         // Listens for incoming connectoin requests
@@ -39,6 +29,7 @@ namespace BB
         // Locks the player queue
         private readonly Object playerQueueLock;
 
+        // Used to track game data
         private int gameTime;
         private static HashSet<string> dictionaryFile;
         private string optionalBoggleBoard;
@@ -60,7 +51,6 @@ namespace BB
             // to the server via the string[] args
             if (args.Length == 2)
             {
-
                 // If file path is not valid, throw exception.
                 if (!System.IO.File.Exists(args[1]))
                     throw new Exception("Invalid dictionary file path.");
@@ -154,7 +144,7 @@ namespace BB
             ss.BeginReceive(messageRetreived, ss);
 
             // Send them a welcome message
-            ss.BeginSend("Welcome To Our Boggle Server \r\n", (e, o) => { }, 2);
+            //ss.BeginSend("Welcome To Our Boggle Server \r\n", (e, o) => { }, 2);
 
             // Start listening for more incoming connections
             boggleServer.BeginAcceptSocket(ConnectionRequested, null);
@@ -188,7 +178,7 @@ namespace BB
             else
             {
                 // The client has deviated from the protocol - send IGNORING message.
-                currentSS.BeginSend("IGNORING " + s + "\r\n", (exc, o) => { }, 2);
+                currentSS.BeginSend("IGNORING " + s + "\n", (exc, o) => { }, 2);
                 currentSS.BeginReceive(messageRetreived, currentSS);
             }
 
@@ -269,8 +259,8 @@ namespace BB
                 //playerTwo.StringSocket.BeginSend("A Game is afoot!\r\n", (e, o) => { }, 2);
 
                 // Send the starting information
-                playerOne.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\r\n", (e, o) => { }, 2);
-                playerTwo.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\r\n", (e, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerTwo.Name + "\n", (e, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("START " + b.ToString() + " " + gameTime + " " + playerOne.Name + "\n", (e, o) => { }, 2);
 
                 // Will invoke timeElapse every 1000 milliseconds
                 timer.Elapsed += timeElapsed;
@@ -304,7 +294,7 @@ namespace BB
                 if (s == null && !gameOver)
                 {
                     // The server should send the command "TERMINATED" to the opponent
-                    opponent.StringSocket.BeginSend("TERMINATED" + "\r\n", (exc, o) => { opponent.StringSocket.Close(); }, 2);
+                    opponent.StringSocket.BeginSend("TERMINATED" + "\n", (exc, o) => { opponent.StringSocket.Close(); }, 2);
 
                     // Exit
                     return;
@@ -348,8 +338,8 @@ namespace BB
                                     opponent.Score += SubScore(word);
 
                                     // Display score to the user
-                                    readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
-                                    opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                                    readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\n", (exc, o) => { }, 2);
+                                    opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\n", (exc, o) => { }, 2);
                                 }
                                 // Otherwise we can add it to the readyPlayer's score.
                                 else
@@ -359,8 +349,8 @@ namespace BB
                                     readyPlayer.Score += AddScore(word);
 
                                     // Display score to the user
-                                    readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
-                                    opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                                    readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\n", (exc, o) => { }, 2);
+                                    opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\n", (exc, o) => { }, 2);
                                 }
                             }
 
@@ -377,8 +367,8 @@ namespace BB
                                 readyPlayer.Score -= 1;
 
                                 // Display score to the user
-                                readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\r\n", (exc, o) => { }, 2);
-                                opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\r\n", (exc, o) => { }, 2);
+                                readyPlayer.StringSocket.BeginSend("SCORE " + readyPlayer.Score + " " + opponent.Score + "\n", (exc, o) => { }, 2);
+                                opponent.StringSocket.BeginSend("SCORE " + opponent.Score + " " + readyPlayer.Score + "\n", (exc, o) => { }, 2);
                             }
                         }
                     }
@@ -386,7 +376,7 @@ namespace BB
                 else
                 {
                     // The client has deviated from the protocol - send IGNORING message.
-                    readyPlayer.StringSocket.BeginSend("IGNORING " + s + "\r\n", (exc, o) => { }, 2);
+                    readyPlayer.StringSocket.BeginSend("IGNORING " + s + "\n", (exc, o) => { }, 2);
                 }
 
                 // Regardless, we need to keep listening to the player
@@ -445,8 +435,8 @@ namespace BB
                 timeCount = timeCount - 1;
 
                 // Notify the players a second has passed
-                playerOne.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
-                playerTwo.StringSocket.BeginSend("TIME " + (timeCount) + "\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("TIME " + (timeCount) + "\n", (exc, o) => { }, 2);
+                playerTwo.StringSocket.BeginSend("TIME " + (timeCount) + "\n", (exc, o) => { }, 2);
 
                 // If we have run out of time then end the game
                 if (timeCount == 0)
@@ -454,8 +444,8 @@ namespace BB
                     timer.Stop();
 
                     // Display final scores to the users
-                    playerOne.StringSocket.BeginSend("SCORE " + playerOne.Score + " " + playerTwo.Score + "\r\n", (exc, o) => { }, 2);
-                    playerTwo.StringSocket.BeginSend("SCORE " + playerTwo.Score + " " + playerOne.Score + "\r\n", (exc, o) => { }, 2);
+                    playerOne.StringSocket.BeginSend("SCORE " + playerOne.Score + " " + playerTwo.Score + "\n", (exc, o) => { }, 2);
+                    playerTwo.StringSocket.BeginSend("SCORE " + playerTwo.Score + " " + playerOne.Score + "\n", (exc, o) => { }, 2);
 
                     // Send the players their final scores and then print the summaries
                     playerOneSummary();
@@ -471,12 +461,15 @@ namespace BB
                 gameOver = true;
 
                 // Prints the stats for player One and when it has completed proceeds to 
-                playerOne.StringSocket.BeginSend("STOP " + printStats(playerOne, playerOne, playerOne.LegalWords) + printStats(playerOne, playerTwo, playerTwo.LegalWords) + printStats(playerOne, playerOne, playerOne.DuplicateWords) + printStats(playerOne, playerOne, playerOne.IllegalWords) + printStats(playerOne, playerTwo, playerTwo.IllegalWords) + "\r\n", (exc, o) => { }, 2);
+                playerOne.StringSocket.BeginSend("STOP " + printStats(playerOne, playerOne, playerOne.LegalWords) + printStats(playerOne, playerTwo, playerTwo.LegalWords) + printStats(playerOne, playerOne, playerOne.DuplicateWords) + printStats(playerOne, playerOne, playerOne.IllegalWords) + printStats(playerOne, playerTwo, playerTwo.IllegalWords) + "\n", (exc, o) => { }, 2);
             }
 
+            /// <summary>
+            /// Prints the stats for the second player and then closes the string sockets
+            /// </summary>
             private void playerTwoSummary()
             {
-                playerTwo.StringSocket.BeginSend("STOP " + printStats(playerTwo, playerTwo, playerTwo.LegalWords) + printStats(playerTwo, playerOne, playerOne.LegalWords) + printStats(playerTwo, playerTwo, playerTwo.DuplicateWords) + printStats(playerTwo, playerTwo, playerTwo.IllegalWords) + printStats(playerTwo, playerOne, playerOne.IllegalWords) + "\r\n", (exc, o) => { playerTwo.StringSocket.Close(); }, 2);
+                playerTwo.StringSocket.BeginSend("STOP " + printStats(playerTwo, playerTwo, playerTwo.LegalWords) + printStats(playerTwo, playerOne, playerOne.LegalWords) + printStats(playerTwo, playerTwo, playerTwo.DuplicateWords) + printStats(playerTwo, playerTwo, playerTwo.IllegalWords) + printStats(playerTwo, playerOne, playerOne.IllegalWords) + "\n", (exc, o) => { playerTwo.StringSocket.Close(); }, 2);
             }
 
             /// <summary>
@@ -578,8 +571,6 @@ namespace BB
                 get { return score; }
                 set { score = value; }
             }
-
-
         }
 
         #endregion
