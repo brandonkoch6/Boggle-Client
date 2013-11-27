@@ -1,0 +1,11 @@
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\obj\Debug\BoggleServerTest.csprojResolveAssemblyReference.cache
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleServerTest.dll
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleServerTest.pdb
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleServer.exe
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\StringSocket.dll
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleBoard.dll
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleServer.pdb
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\StringSocket.pdb
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\bin\Debug\BoggleBoard.pdb
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\obj\Debug\BoggleServerTest.dll
+C:\Users\Dalton\Desktop\School\CS 3500\Assignments\PS8Git\BoggleServerTest\obj\Debug\BoggleServerTest.pdb
