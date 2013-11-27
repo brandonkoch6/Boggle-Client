@@ -11,35 +11,35 @@ using BB;
 namespace BoggleServerTest
 {
     #region WORD LIST FOR OUR CUSTOM BOARD
-        // plonk
-        // knife
-        // ponk
-        // polk
-        // onie
-        // nife
-        // nief
-        // mino
-        // mink
-        // koji
-        // knop
-        // jink
-        // glop
-        // fino
-        // fink
-        // bein
-        // pol
-        // nim
-        // nie
-        // lop
-        // kop
-        // kon
-        // jol
-        // jin
-        // ink
-        // fin
-        // fie
-        // fae
-        // fab
+    // plonk
+    // knife
+    // ponk
+    // polk
+    // onie
+    // nife
+    // nief
+    // mino
+    // mink
+    // koji
+    // knop
+    // jink
+    // glop
+    // fino
+    // fink
+    // bein
+    // pol
+    // nim
+    // nie
+    // lop
+    // kop
+    // kon
+    // jol
+    // jin
+    // ink
+    // fin
+    // fie
+    // fae
+    // fab
     #endregion
 
     [TestClass]
@@ -92,7 +92,7 @@ namespace BoggleServerTest
                 StringSocket player2SS = null;
 
                 try
-                {           
+                {
                     // Create two new players
                     player1 = new TcpClient("localhost", port);
                     player2 = new TcpClient("localhost", port);
@@ -131,30 +131,30 @@ namespace BoggleServerTest
                     // Make sure the lines were received properly.
                     Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
                     Assert.AreEqual("Welcome To Our Boggle Server \r", s1);
-                  
+
 
                     Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
                     Assert.AreEqual("Welcome To Our Boggle Server \r", s2);
-                
+
 
                     Assert.AreEqual(true, mre3.WaitOne(timeout), "Timed out waiting 3");
                     Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 brandon\r", s3);
-                   
+
 
                     Assert.AreEqual(true, mre4.WaitOne(timeout), "Timed out waiting 4");
                     Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 dalton\r", s4);
-                 
+
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: -1 0\r", s5);
-     
+                    Assert.AreEqual("SCORE -1 0\r", s5);
+
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 -1\r", s6);
+                    Assert.AreEqual("SCORE 0 -1\r", s6);
 
                 }
                 finally
-                {   
+                {
                     player1SS.Close();
                     player2SS.Close();
                     server.Stop();
@@ -206,7 +206,7 @@ namespace BoggleServerTest
 
                     player1SS.BeginReceive(CompletedReceive5, player1SS);
                 }
-                    
+
             }
 
             private void CompletedReceive6(String s, Exception o, object payload)
@@ -332,11 +332,11 @@ namespace BoggleServerTest
 
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: -1 0\r", s5);
+                    Assert.AreEqual("SCORE -1 0\r", s5);
 
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 -1\r", s6);
+                    Assert.AreEqual("SCORE 0 -1\r", s6);
 
                 }
                 finally
@@ -518,11 +518,11 @@ namespace BoggleServerTest
 
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: 2 0\r", s5);
+                    Assert.AreEqual("SCORE 2 0\r", s5);
 
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 2\r", s6);
+                    Assert.AreEqual("SCORE 0 2\r", s6);
 
                 }
                 finally
@@ -694,6 +694,7 @@ namespace BoggleServerTest
                     player2SS.BeginSend("play brandon \n", (e, o) => { }, 1);
                     //Thread.Sleep(3000);
                     player1SS.BeginSend("word knife \n", (e, o) => { }, 1);
+                    Thread.Sleep(1000);
                     player2SS.BeginSend("word knife \n", (e, o) => { }, 1);
 
                     // Make sure the lines were received properly.
@@ -710,16 +711,16 @@ namespace BoggleServerTest
                     Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 dalton\r", s4);
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: 2 0\r", s5);
+                    Assert.AreEqual("SCORE 2 0\r", s5);
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 2\r", s6);
+                    Assert.AreEqual("SCORE 0 2\r", s6);
 
                     Assert.AreEqual(true, mre7.WaitOne(timeout), "Timed out waiting 7");
-                    Assert.AreEqual("SCORE: 0 0\r", s7);
+                    Assert.AreEqual("SCORE 0 0\r", s7);
 
                     Assert.AreEqual(true, mre8.WaitOne(timeout), "Timed out waiting 8");
-                    Assert.AreEqual("SCORE: 0 0\r", s8);
+                    Assert.AreEqual("SCORE 0 0\r", s8);
 
                 }
                 finally
@@ -937,13 +938,13 @@ namespace BoggleServerTest
                     Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 dalton\r", s4);
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: 2 0\r", s5);
+                    Assert.AreEqual("SCORE 2 0\r", s5);
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 2\r", s6);
+                    Assert.AreEqual("SCORE 0 2\r", s6);
 
                     Assert.AreEqual(true, mre7.WaitOne(timeout), "Timed out waiting 7");
-                    Assert.AreEqual("IGNORING: watson \r", s7);
+                    Assert.AreEqual("IGNORING watson \r", s7);
 
                 }
                 finally
@@ -1053,7 +1054,7 @@ namespace BoggleServerTest
         public class Test6Class
         {
             // Create and start a BoggleServer, this will be used for all subsequent tests
-            BoggleServer server = new BoggleServer("5", ".../.../.../dictionary.txt", "ABCDEFGHIJKLMNOP");
+            BoggleServer server = new BoggleServer("6", ".../.../.../dictionary.txt", "ABCDEFGHIJKLMNOP");
 
             // Data that is shared across threads
             private ManualResetEvent mre1;
@@ -1063,6 +1064,7 @@ namespace BoggleServerTest
             private ManualResetEvent mre5;
             private ManualResetEvent mre6;
             private ManualResetEvent mre7;
+            private ManualResetEvent mre8;
             private String s1;
             private object p1;
             private String s2;
@@ -1077,6 +1079,8 @@ namespace BoggleServerTest
             private object p6;
             private String s7;
             private object p7;
+            private String s8;
+            private object p8;
 
 
             // Timeout used in test case
@@ -1114,6 +1118,7 @@ namespace BoggleServerTest
                     mre5 = new ManualResetEvent(false);
                     mre6 = new ManualResetEvent(false);
                     mre7 = new ManualResetEvent(false);
+                    mre8 = new ManualResetEvent(false);
 
                     // Make the receive requests
                     player1SS.BeginReceive(CompletedReceive1, player1SS);
@@ -1122,7 +1127,9 @@ namespace BoggleServerTest
                     player2SS.BeginReceive(CompletedReceive4, player2SS);
                     player1SS.BeginReceive(CompletedReceive5, player1SS);
                     player2SS.BeginReceive(CompletedReceive6, player2SS);
+
                     player1SS.BeginReceive(CompletedReceive7, player1SS);
+                    player1SS.BeginReceive(CompletedReceive8, player1SS);
 
                     // Send some commands
                     player1SS.BeginSend("play dalton \n", (e, o) => { }, 1);
@@ -1137,22 +1144,29 @@ namespace BoggleServerTest
                     Assert.AreEqual("Welcome To Our Boggle Server \r", s2);
 
                     Assert.AreEqual(true, mre3.WaitOne(timeout), "Timed out waiting 3");
-                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 brandon\r", s3);
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 6 brandon\r", s3);
 
                     Assert.AreEqual(true, mre4.WaitOne(timeout), "Timed out waiting 4");
-                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 dalton\r", s4);
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 6 dalton\r", s4);
 
                     Assert.AreEqual(true, mre5.WaitOne(timeout), "Timed out waiting 5");
-                    Assert.AreEqual("SCORE: 2 0\r", s5);
+                    Assert.AreEqual("SCORE 2 0\r", s5);
 
                     Assert.AreEqual(true, mre6.WaitOne(timeout), "Timed out waiting 6");
-                    Assert.AreEqual("SCORE: 0 2\r", s6);
+                    Assert.AreEqual("SCORE 0 2\r", s6);
 
                     // Wait for the game to end
-                    Thread.Sleep(5000);
+                    Thread.Sleep(6000);
 
                     Assert.AreEqual(true, mre7.WaitOne(timeout), "Timed out waiting 7");
-                    Assert.AreEqual("STOP 1 KNIFE 0 0 0 0 \r", s7);
+                    Assert.AreEqual("SCORE 2 0\r", s7);
+
+                    Thread.Sleep(1000);
+
+                    Assert.AreEqual(true, mre8.WaitOne(timeout), "Timed out waiting 7");
+                    Assert.AreEqual("STOP 1 KNIFE 0 0 0 0 \r", s8);
+
+                    //"STOP 1 KNIFE 0 0 0 0 \r"
 
                 }
                 finally
@@ -1247,7 +1261,194 @@ namespace BoggleServerTest
                     player1SS.BeginReceive(CompletedReceive7, player1SS);
                 }
             }
+
+            private void CompletedReceive8(String s, Exception o, object payload)
+            {
+                // Only record the message if it is not a time message
+                if (!s.StartsWith("TIME"))
+                {
+                    s8 = s;
+                    p8 = payload;
+                    mre8.Set();
+                }
+                // Keep listening
+                else
+                {
+                    StringSocket player1SS = (StringSocket)payload;
+
+                    player1SS.BeginReceive(CompletedReceive8, player1SS);
+                }
+            }
             #endregion
         }
+
+        /// <summary>
+        /// Tests the summary functionality for one players
+        /// </summary>
+        [TestMethod]
+        public void TestABetterWay()
+        {
+            new Test7Class().run(2000);
+        }
+
+        public class Test7Class
+        {
+            // Create and start a BoggleServer, this will be used for all subsequent tests
+            BoggleServer server = new BoggleServer("5", ".../.../.../dictionary.txt", "ABCDEFGHIJKLMNOP");
+
+            // Data that is shared across threads
+            private ManualResetEvent mre1;
+            private ManualResetEvent mre2;
+
+            private String s1;
+            private object p1;
+
+            private String s2;
+            private object p2;
+
+            // Timeout used in test case
+            private static int timeout = 2000;
+
+            public void run(int port)
+            {
+
+                TcpClient player1 = null;
+                TcpClient player2 = null;
+
+                StringSocket player1SS = null;
+                StringSocket player2SS = null;
+
+                try
+                {
+
+                    // Create the two players
+                    player1 = new TcpClient("localhost", port);
+                    player2 = new TcpClient("localhost", port);
+
+                    // Create the internal sockets
+                    Socket player1Socket = player1.Client;
+                    Socket player2Socket = player2.Client;
+
+                    // Create the players String Sockets
+                    player1SS = new StringSocket(player1Socket, new UTF8Encoding());
+                    player2SS = new StringSocket(player2Socket, new UTF8Encoding());
+
+                    // This will coordinate communication between the threads of the test cases
+                    mre1 = new ManualResetEvent(false);
+                    mre2 = new ManualResetEvent(false);
+
+                    // Make the receive requests
+                    player1SS.BeginReceive(CompletedReceive1, player1SS);
+                    player2SS.BeginReceive(CompletedReceive2, player2SS);
+
+                    // Send some commands
+                    player1SS.BeginSend("play dalton \n", (e, o) => { }, 1);
+                    player2SS.BeginSend("play brandon \n", (e, o) => { }, 1);
+                    player1SS.BeginSend("word knife \n", (e, o) => { }, 1);
+
+                    // Make sure the lines were received properly.
+                    Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
+                    Assert.AreEqual("Welcome To Our Boggle Server \r", s1);
+
+                    Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
+                    Assert.AreEqual("Welcome To Our Boggle Server \r", s2);
+
+                    #region Repeat This When Looking for the next Line
+                    // Get ready for another round of assertions
+                    resetCallbacks(player1SS, player2SS);
+
+                    Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 brandon\r", s1);
+
+                    Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
+                    Assert.AreEqual("START ABCDEFGHIJKLMNOP 5 dalton\r", s2);
+                    #endregion
+
+                    // Get ready for another round of assertions
+                    resetCallbacks(player1SS, player2SS);
+
+                    Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
+                    Assert.AreEqual("SCORE 2 0\r", s1);
+
+                    Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
+                    Assert.AreEqual("SCORE 0 2\r", s2);
+
+                    // Sleep away the rest of the game
+                    Thread.Sleep(5000);
+
+                    // Get ready for another round of assertions
+                    resetCallbacks(player1SS, player2SS);
+
+                    Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
+                    Assert.AreEqual("SCORE 2 0\r", s1);
+
+                    Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
+                    Assert.AreEqual("SCORE 0 2\r", s2);
+
+                    // Get ready for another round of assertions
+                    resetCallbacks(player1SS, player2SS);
+
+                    Assert.AreEqual(true, mre1.WaitOne(timeout), "Timed out waiting 1");
+                    Assert.AreEqual("STOP 1 KNIFE 0 0 0 0 \r", s1);
+
+                    Assert.AreEqual(true, mre2.WaitOne(timeout), "Timed out waiting 2");
+                    Assert.AreEqual("STOP 0 1 KNIFE 0 0 0 \r", s2);
+                }
+                finally
+                {
+                    player1SS.Close();
+                    player2SS.Close();
+                    server.Stop();
+                }
+            }
+
+            public void resetCallbacks(StringSocket player1SS, StringSocket player2SS)
+            {
+                mre1 = new ManualResetEvent(false);
+                mre2 = new ManualResetEvent(false);
+                player1SS.BeginReceive(CompletedReceive1, player1SS);
+                player2SS.BeginReceive(CompletedReceive2, player2SS);
+            }
+            #region Receive Callbacks
+
+            private void CompletedReceive1(String s, Exception o, object payload)
+            {
+                // Only record the message if it is not a time message
+                if (!s.StartsWith("TIME"))
+                {
+                    s1 = s;
+                    p1 = payload;
+                    mre1.Set();
+                }
+                // Keep listening
+                else
+                {
+                    StringSocket player1SS = (StringSocket)payload;
+
+                    player1SS.BeginReceive(CompletedReceive1, player1SS);
+                }
+            }
+
+            private void CompletedReceive2(String s, Exception o, object payload)
+            {
+                // Only record the message if it is not a time message
+                if (!s.StartsWith("TIME"))
+                {
+                    s2 = s;
+                    p2 = payload;
+                    mre2.Set();
+                }
+                // Keep listening
+                else
+                {
+                    StringSocket player2SS = (StringSocket)payload;
+
+                    player2SS.BeginReceive(CompletedReceive2, player2SS);
+                }
+            }
+
+            #endregion
+        }
+
     }
 }
